@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.puji.guidelicense.MainActivity" >
+
+    <item
+        android:id="@+id/action_f4"
+        android:orderInCategory="100"
+        android:title="F4"/>
+    <item
+        android:id="@+id/action_f5"
+        android:orderInCategory="100"
+        android:title="F5"/>
+    <item
+        android:id="@+id/action_f5_2"
+        android:orderInCategory="100"
+        android:title="F5_2"/>
+    <item
+        android:id="@+id/action_f11"
+        android:orderInCategory="100"
+        android:title="F11"/>
+    <item
+        android:id="@+id/action_f11_2"
+        android:orderInCategory="100"
+        android:title="F11_2"/>
+
+</menu>
