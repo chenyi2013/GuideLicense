@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		flag = DataSource.FLOOR_11_2;
+		flag = DataSource.FLOOR_4;
 
 		switch (flag) {
 		case DataSource.FLOOR_5:
@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
 	class GuideAdapter extends BaseAdapter {
 
 		class ViewHolder {
-			private TextView mFloorName;
+			private FoolView mFloorName;
 			private TextView mTag;
 			private TextView mShops;
 
@@ -108,7 +108,7 @@ public class MainActivity extends Activity {
 						itemLayout, parent, false);
 
 				viewHolder = new ViewHolder();
-				viewHolder.mFloorName = (TextView) convertView
+				viewHolder.mFloorName = (FoolView) convertView
 						.findViewById(R.id.floor_name);
 				viewHolder.mShops = (TextView) convertView
 						.findViewById(R.id.shops);

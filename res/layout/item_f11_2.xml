@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.puji.guidelicense"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -13,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <TextView
+        <com.puji.guidelicense.FoolView
             android:id="@+id/floor_name"
             style="@style/Floor_Name_F11_2"
             android:layout_width="wrap_content"
