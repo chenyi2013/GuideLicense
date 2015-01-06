@@ -1,4 +1,7 @@
-package com.puji.guidelicense;
+package com.puji.guidelicense.view;
+
+import com.puji.guidelicense.R;
+import com.puji.guidelicense.R.styleable;
 
 import android.content.Context;
 import android.content.res.TypedArray;

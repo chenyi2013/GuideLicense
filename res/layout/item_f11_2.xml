@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <com.puji.guidelicense.FoolView
+        <com.puji.guidelicense.view.FoolView
             android:id="@+id/floor_name"
             style="@style/Floor_Name_F11_2"
             android:layout_width="wrap_content"
