@@ -6,6 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * 封装数据库增、删、查操作的业务类
+ * 
+ * @author Kevin Chen
+ * 
+ */
 public class DatabaseDao {
 
 	private final Activity activity;
@@ -18,6 +24,12 @@ public class DatabaseDao {
 
 	}
 
+	/**
+	 * 插入一条数据记录
+	 * 
+	 * @param userName
+	 * @param content
+	 */
 	public void insertData(String userName, String content) {
 
 		SQLiteOpenHelper helper = new DBHelper(activity);
@@ -49,6 +61,12 @@ public class DatabaseDao {
 
 	}
 
+	/**
+	 * 查询数据记录
+	 * 
+	 * @param userName
+	 * @return
+	 */
 	public String queryData(String userName) {
 		SQLiteOpenHelper helper = new DBHelper(activity);
 		SQLiteDatabase db = null;
@@ -69,6 +87,11 @@ public class DatabaseDao {
 
 	}
 
+	/**
+	 * 删除数据
+	 * 
+	 * @param userName
+	 */
 	public void deleteData(String userName) {
 
 		SQLiteOpenHelper helper = new DBHelper(activity);
@@ -91,6 +114,12 @@ public class DatabaseDao {
 
 	}
 
+	/**
+	 * 关闭数据库和游标
+	 * 
+	 * @param db
+	 * @param cursor
+	 */
 	private void close(SQLiteDatabase db, Cursor cursor) {
 
 		if (db != null) {

@@ -4,7 +4,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,21 +21,39 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.puji.guidelicense.application.GuideLicenseApplication;
 import com.puji.guidelicense.bean.FloorData;
 import com.puji.guidelicense.config.Urls;
+import com.puji.guidelicense.db.DatabaseDao;
 import com.puji.guidelicense.util.JsonParser;
+import com.puji.guidelicense.util.NetworkUtil;
 import com.puji.guidelicense.util.ProgressGenerator;
 import com.puji.guidelicense.view.ActionProcessButton;
 
+/**
+ * 用户登录界面
+ * 
+ * @author Kevin
+ * 
+ */
 public class LoginActivity extends Activity implements
 		ProgressGenerator.OnCompleteListener {
 
 	public static final String FLOOR_INFO = "floor_info";
 
+	private static final String USER_NAME_KEY = "user_name";
+	private static final String PASSWORD_KEY = "password";
+
 	private ActionProcessButton mLoginButton;
 	private GuideLicenseApplication mApplication;
 	private RequestQueue mRequestQueue;
 	private FloorData mData;
-	private EditText mUserName;
-	private EditText mPassword;
+
+	private EditText mUserNameEditText;
+	private EditText mPasswordEditText;
+
+	private String mUserName;
+	private String mPassword;
+
+	private DatabaseDao mDao;
+	private SharedPreferences mSharedPreferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,34 +62,86 @@ public class LoginActivity extends Activity implements
 
 		mApplication = (GuideLicenseApplication) getApplication();
 		mRequestQueue = mApplication.getRequestQueue();
+		mSharedPreferences = getPreferences(Context.MODE_PRIVATE);
+		mDao = new DatabaseDao(this);
 
 		mLoginButton = (ActionProcessButton) findViewById(R.id.login_button);
 		mLoginButton.setMode(ActionProcessButton.Mode.ENDLESS);
-		mUserName = (EditText) findViewById(R.id.user_name);
-		mPassword = (EditText) findViewById(R.id.password);
+
+		mUserNameEditText = (EditText) findViewById(R.id.user_name);
+		mPasswordEditText = (EditText) findViewById(R.id.password);
 
 		final ProgressGenerator progressGenerator = new ProgressGenerator(this);
+
+		// 如果以前登录过，尝试自动登录
+		if (mSharedPreferences.contains(USER_NAME_KEY)
+				&& mSharedPreferences.contains(PASSWORD_KEY)) {
+			mUserName = mSharedPreferences.getString(USER_NAME_KEY, null);
+			mPassword = mSharedPreferences.getString(PASSWORD_KEY, null);
+
+			if (mUserName != null && mPassword != null && !mUserName.isEmpty()
+					&& !mPassword.isEmpty()) {
+				mUserNameEditText.setText(mUserName);
+				mPasswordEditText.setText(mPassword);
+				progressGenerator.start(mLoginButton);
+				login();
+			}
+		}
+
 		mLoginButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View view) {
 				progressGenerator.start(mLoginButton);
-				loadData();
+
+				mUserName = mUserNameEditText.getText().toString().trim();
+				mPassword = mPasswordEditText.getText().toString().trim();
+				login();
 			}
 		});
 
 	}
 
-	private void loadData() {
+	// 登录
+	private void login() {
+		if (NetworkUtil.isNetworkConnected(LoginActivity.this)) {
+			loadNetworkData();
+		} else {
+			loadLocalData(mUserName);
+		}
+	}
+
+	// 加载本地数据
+	private void loadLocalData(String userName) {
+		String json = mDao.queryData(userName);
+		if (json != null) {
+
+			mData = JsonParser.getParsedData(json, FloorData.class);
+
+			if (mData != null && mData.getData() != null
+					&& mData.getData().getList() != null) {
+				Intent intent = new Intent(LoginActivity.this,
+						MainActivity.class);
+				intent.putExtra(FLOOR_INFO, mData);
+				startActivity(intent);
+				finish();
+			}
+
+		}
+
+	}
+
+	// 加载网络数据
+	private void loadNetworkData() {
 
 		JSONObject object = new JSONObject();
 		try {
 			object.put("Method", "devicelogin.login");
-//			 object.put("UserName", "fuli14");
-//			 object.put("Password", "123456");
+			// object.put("UserName", "fuli14");
+			// object.put("Password", "123456");
 
-			object.put("UserName", mUserName.getText().toString().trim());
-			object.put("Password", mPassword.getText().toString().trim());
+			object.put("UserName", mUserName);
+			object.put("Password", mPassword);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -86,6 +158,17 @@ public class LoginActivity extends Activity implements
 
 							if (mData != null && mData.getData() != null
 									&& mData.getData().getList() != null) {
+
+								// 存储用户名到共享参数中
+								mSharedPreferences.edit()
+										.putString(USER_NAME_KEY, mUserName)
+										.commit();
+								// 存储用户密码到共享参数中
+								mSharedPreferences.edit()
+										.putString(PASSWORD_KEY, mPassword)
+										.commit();
+								// 将加载的网络数据保存到本地数据库中
+								mDao.insertData(mUserName, response.toString());
 								Intent intent = new Intent(LoginActivity.this,
 										MainActivity.class);
 								intent.putExtra(FLOOR_INFO, mData);
@@ -99,13 +182,12 @@ public class LoginActivity extends Activity implements
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-
+						loadLocalData(mUserName);
 					}
 				});
 
 		request.setShouldCache(false);
 		mRequestQueue.add(request);
-
 	}
 
 	@Override

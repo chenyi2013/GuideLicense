@@ -21,23 +21,24 @@
         <EditText
             android:id="@+id/user_name"
             style="@style/login_input"
-            android:hint="账号" />
+            android:hint="@string/account" />
 
         <EditText
             android:id="@+id/password"
             style="@style/login_input"
-            android:hint="密码" />
+            android:hint="@string/password"
+            android:inputType="textPassword" />
 
         <com.puji.guidelicense.view.ActionProcessButton
             android:id="@+id/login_button"
             style="@style/login_button"
-            android:text="登录"
+            android:text="@string/login"
             custom:pb_colorComplete="@color/green_complete"
             custom:pb_colorNormal="#e9336f"
             custom:pb_colorPressed="#a3244d"
             custom:pb_colorProgress="@color/purple_progress"
             custom:pb_textComplete="success"
-            custom:pb_textProgress="登录中..." />
+            custom:pb_textProgress="@string/logining" />
     </LinearLayout>
 
 </RelativeLayout>

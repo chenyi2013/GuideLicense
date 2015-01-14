@@ -4,6 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * 创建数据库的帮助类
+ * 
+ * @author Administrator
+ * 
+ */
 public class DBHelper extends SQLiteOpenHelper {
 
 	private static final int DB_VERSION = 1;
@@ -20,7 +26,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase sqLiteDatabase) {
 		sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " (" + ID_COL
-				+ "VARCHAR(10) PRIMARY KEY, " + TEXT_COL + " TEXT);");
+				+ " VARCHAR(10) PRIMARY KEY, " + TEXT_COL + " TEXT);");
 	}
 
 	@Override

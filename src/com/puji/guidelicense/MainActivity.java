@@ -22,6 +22,12 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * 引导牌界面
+ * 
+ * @author Kevin
+ * 
+ */
 public class MainActivity extends Activity {
 
 	private ListView mListView;
@@ -42,6 +48,9 @@ public class MainActivity extends Activity {
 	private float numberSize = 12;
 	private float textFactor = 1;
 
+	private int currentFloorColor = Color.parseColor("#fe9200");
+	private int otherFloorColor = Color.WHITE;
+
 	private boolean isA = false;
 	private boolean isB = false;
 
@@ -49,8 +58,6 @@ public class MainActivity extends Activity {
 	Handler mHandler = new Handler() {
 
 		public void handleMessage(Message msg) {
-
-			System.out.println(mListView.getLastVisiblePosition());
 
 			if (mListView.getLastVisiblePosition() < mFloors.size() + 1) {
 				isA = true;
@@ -87,8 +94,8 @@ public class MainActivity extends Activity {
 
 			}
 
-			letterSize = tagSize * 2;
-			numberSize = tagSize;
+			letterSize = tagSize * 4f;
+			numberSize = tagSize * 1.5f;
 			mTitleTv.setTextSize(convertSpToPx((int) (tagSize * 2.5)));
 			mListView.setAdapter(mAdapter);
 
@@ -204,9 +211,9 @@ public class MainActivity extends Activity {
 			viewHolder = (ViewHolder) convertView.getTag();
 			viewHolder.mFloorName.setText(floor.getFloor());
 			viewHolder.mFloorName
-					.setFloorLetterSize(convertSpToPx((int) letterSize * 2));
+					.setFloorLetterSize(convertSpToPx((int) letterSize));
 			viewHolder.mFloorName
-					.setFloorNumberSize(convertSpToPx((int) (numberSize * 1.5)));
+					.setFloorNumberSize(convertSpToPx((int) (numberSize)));
 			viewHolder.mShops.setText(Html.fromHtml(floor.getInfo()));
 			viewHolder.mShops.setTextSize(convertSpToPx(shopsSize));
 			viewHolder.mShops.setLineSpacing(1, textFactor);
@@ -223,16 +230,16 @@ public class MainActivity extends Activity {
 
 			if (currentFloorId.equals(floor.getFloorID())) {
 
-				viewHolder.mTag.setTextColor(Color.YELLOW);
-				viewHolder.mShops.setTextColor(Color.YELLOW);
-				viewHolder.mFloorName.setFloorLetterColor(Color.YELLOW);
-				viewHolder.mFloorName.setFloorNumberColor(Color.YELLOW);
+				viewHolder.mTag.setTextColor(currentFloorColor);
+				viewHolder.mShops.setTextColor(currentFloorColor);
+				viewHolder.mFloorName.setFloorLetterColor(currentFloorColor);
+				viewHolder.mFloorName.setFloorNumberColor(currentFloorColor);
 
 			} else {
-				viewHolder.mTag.setTextColor(Color.WHITE);
-				viewHolder.mShops.setTextColor(Color.WHITE);
-				viewHolder.mFloorName.setFloorLetterColor(Color.WHITE);
-				viewHolder.mFloorName.setFloorNumberColor(Color.WHITE);
+				viewHolder.mTag.setTextColor(otherFloorColor);
+				viewHolder.mShops.setTextColor(otherFloorColor);
+				viewHolder.mFloorName.setFloorLetterColor(otherFloorColor);
+				viewHolder.mFloorName.setFloorNumberColor(otherFloorColor);
 			}
 
 			return convertView;
