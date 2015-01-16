@@ -4,9 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +23,7 @@ import com.puji.guidelicense.db.DatabaseDao;
 import com.puji.guidelicense.util.JsonParser;
 import com.puji.guidelicense.util.NetworkUtil;
 import com.puji.guidelicense.util.ProgressGenerator;
+import com.puji.guidelicense.util.SharePreferenceHelper;
 import com.puji.guidelicense.view.ActionProcessButton;
 
 /**
@@ -38,8 +37,7 @@ public class LoginActivity extends Activity implements
 
 	public static final String FLOOR_INFO = "floor_info";
 
-	private static final String USER_NAME_KEY = "user_name";
-	private static final String PASSWORD_KEY = "password";
+	private SharePreferenceHelper mHelper;
 
 	private ActionProcessButton mLoginButton;
 	private GuideLicenseApplication mApplication;
@@ -53,7 +51,6 @@ public class LoginActivity extends Activity implements
 	private String mPassword;
 
 	private DatabaseDao mDao;
-	private SharedPreferences mSharedPreferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +59,7 @@ public class LoginActivity extends Activity implements
 
 		mApplication = (GuideLicenseApplication) getApplication();
 		mRequestQueue = mApplication.getRequestQueue();
-		mSharedPreferences = getPreferences(Context.MODE_PRIVATE);
+		mHelper = new SharePreferenceHelper(this);
 		mDao = new DatabaseDao(this);
 
 		mLoginButton = (ActionProcessButton) findViewById(R.id.login_button);
@@ -74,10 +71,9 @@ public class LoginActivity extends Activity implements
 		final ProgressGenerator progressGenerator = new ProgressGenerator(this);
 
 		// 如果以前登录过，尝试自动登录
-		if (mSharedPreferences.contains(USER_NAME_KEY)
-				&& mSharedPreferences.contains(PASSWORD_KEY)) {
-			mUserName = mSharedPreferences.getString(USER_NAME_KEY, null);
-			mPassword = mSharedPreferences.getString(PASSWORD_KEY, null);
+		if (mHelper.isExistAccount() && mHelper.isExistPassword()) {
+			mUserName = mHelper.getAccount();
+			mPassword = mHelper.getPassword();
 
 			if (mUserName != null && mPassword != null && !mUserName.isEmpty()
 					&& !mPassword.isEmpty()) {
@@ -92,10 +88,25 @@ public class LoginActivity extends Activity implements
 
 			@Override
 			public void onClick(View view) {
-				progressGenerator.start(mLoginButton);
 
 				mUserName = mUserNameEditText.getText().toString().trim();
 				mPassword = mPasswordEditText.getText().toString().trim();
+
+				if (mUserName == null || mUserName.isEmpty()) {
+
+					mUserNameEditText.setError("用户名不能为空，请重新输入！");
+					mUserNameEditText.requestFocus();
+					return;
+
+				}
+
+				if (mPassword == null || mPassword.isEmpty()) {
+					mPasswordEditText.setError("密码不能为空，请重新输入！");
+					mPasswordEditText.requestFocus();
+					return;
+				}
+
+				progressGenerator.start(mLoginButton);
 				login();
 			}
 		});
@@ -111,6 +122,22 @@ public class LoginActivity extends Activity implements
 		}
 	}
 
+	private void switchNextAct() {
+
+		Intent intent = null;
+		if (mHelper.getCurrentFloor(mUserName) != null
+				&& !mHelper.getCurrentFloor(mUserName).isEmpty()) {
+			intent = new Intent(LoginActivity.this, MainActivity.class);
+
+		} else {
+			intent = new Intent(LoginActivity.this, PickerFloorActivity.class);
+		}
+
+		intent.putExtra(FLOOR_INFO, mData);
+		startActivity(intent);
+		finish();
+	}
+
 	// 加载本地数据
 	private void loadLocalData(String userName) {
 		String json = mDao.queryData(userName);
@@ -120,11 +147,7 @@ public class LoginActivity extends Activity implements
 
 			if (mData != null && mData.getData() != null
 					&& mData.getData().getList() != null) {
-				Intent intent = new Intent(LoginActivity.this,
-						MainActivity.class);
-				intent.putExtra(FLOOR_INFO, mData);
-				startActivity(intent);
-				finish();
+				switchNextAct();
 			}
 
 		}
@@ -158,22 +181,14 @@ public class LoginActivity extends Activity implements
 
 							if (mData != null && mData.getData() != null
 									&& mData.getData().getList() != null) {
-
 								// 存储用户名到共享参数中
-								mSharedPreferences.edit()
-										.putString(USER_NAME_KEY, mUserName)
-										.commit();
+								mHelper.saveAccount(mUserName);
 								// 存储用户密码到共享参数中
-								mSharedPreferences.edit()
-										.putString(PASSWORD_KEY, mPassword)
-										.commit();
+								mHelper.savePassword(mPassword);
 								// 将加载的网络数据保存到本地数据库中
 								mDao.insertData(mUserName, response.toString());
-								Intent intent = new Intent(LoginActivity.this,
-										MainActivity.class);
-								intent.putExtra(FLOOR_INFO, mData);
-								startActivity(intent);
-								finish();
+								switchNextAct();
+
 							}
 						}
 

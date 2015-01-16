@@ -4,12 +4,16 @@ import java.util.ArrayList;
 
 import com.puji.guidelicense.bean.FloorData;
 import com.puji.guidelicense.bean.FloorInfo;
+import com.puji.guidelicense.util.SharePreferenceHelper;
 import com.puji.guidelicense.view.FoolView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,13 +38,14 @@ public class MainActivity extends Activity {
 	private TextView mTitleTv;
 	private GuideAdapter mAdapter;
 	private ArrayList<FloorInfo> mFloors;
-
 	private int itemLayout;
 	private int headerLayout;
 
 	private final int maxFontSize = 26;
 	private final int minFontSize = 12;
-	private String currentFloorId;
+	private String currentFoolor;
+
+	private SharePreferenceHelper mHelper;
 
 	private float tagSize = 12;
 	private float shopsSize = 12;
@@ -115,6 +120,8 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		mHelper = new SharePreferenceHelper(this);
+
 		itemLayout = R.layout.item_f4;
 		headerLayout = R.layout.header_f4;
 
@@ -143,7 +150,7 @@ public class MainActivity extends Activity {
 		Intent intent = getIntent();
 		FloorData floorData = (FloorData) intent
 				.getSerializableExtra(LoginActivity.FLOOR_INFO);
-		currentFloorId = floorData.getData().getFloorID();
+		currentFoolor = mHelper.getCurrentFloor(mHelper.getAccount());
 		mAdapter = new GuideAdapter();
 		mAdapter.bindData(mFloors = floorData.getData().getList());
 		mListView.setAdapter(mAdapter);
@@ -154,6 +161,15 @@ public class MainActivity extends Activity {
 				mHandler.sendEmptyMessage(1);
 			}
 		});
+
+	}
+
+	private int getFontHeight(float fontSize, String content) {
+		Paint paint = new Paint();
+		paint.setTextSize(fontSize);
+		Rect rect = new Rect();
+		paint.getTextBounds(content, 0, content.length(), rect);
+		return rect.height();
 
 	}
 
@@ -214,7 +230,21 @@ public class MainActivity extends Activity {
 					.setFloorLetterSize(convertSpToPx((int) letterSize));
 			viewHolder.mFloorName
 					.setFloorNumberSize(convertSpToPx((int) (numberSize)));
-			viewHolder.mShops.setText(Html.fromHtml(floor.getInfo()));
+			viewHolder.mShops.setText(Html.fromHtml(floor.getInfo(),
+					new Html.ImageGetter() {
+
+						@Override
+						public Drawable getDrawable(String string) {
+
+							int height = getFontHeight(
+									convertSpToPx(shopsSize), "测试");
+							Drawable drawable = getResources().getDrawable(
+									R.drawable.ic_launcher);
+							drawable.setBounds(0, 0, height, height);
+							return drawable;
+						}
+					}, null));
+
 			viewHolder.mShops.setTextSize(convertSpToPx(shopsSize));
 			viewHolder.mShops.setLineSpacing(1, textFactor);
 
@@ -228,7 +258,7 @@ public class MainActivity extends Activity {
 				viewHolder.mTag.setTextSize(convertSpToPx(tagSize));
 			}
 
-			if (currentFloorId.equals(floor.getFloorID())) {
+			if (currentFoolor.equals(floor.getFloor())) {
 
 				viewHolder.mTag.setTextColor(currentFloorColor);
 				viewHolder.mShops.setTextColor(currentFloorColor);
@@ -244,7 +274,6 @@ public class MainActivity extends Activity {
 
 			return convertView;
 		}
-
 	}
 
 }
