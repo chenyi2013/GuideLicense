@@ -23,11 +23,13 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
         </activity>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
+            android:launchMode="singleTask"
             android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
@@ -39,6 +41,7 @@
         <activity
             android:name=".PickerFloorActivity"
             android:label="@string/title_activity_picker_floor"
+            android:launchMode="singleTask"
             android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" >
         </activity>
     </application>

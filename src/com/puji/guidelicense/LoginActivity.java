@@ -70,19 +70,19 @@ public class LoginActivity extends Activity implements
 
 		final ProgressGenerator progressGenerator = new ProgressGenerator(this);
 
-		// 如果以前登录过，尝试自动登录
-		if (mHelper.isExistAccount() && mHelper.isExistPassword()) {
-			mUserName = mHelper.getAccount();
-			mPassword = mHelper.getPassword();
-
-			if (mUserName != null && mPassword != null && !mUserName.isEmpty()
-					&& !mPassword.isEmpty()) {
-				mUserNameEditText.setText(mUserName);
-				mPasswordEditText.setText(mPassword);
-				progressGenerator.start(mLoginButton);
-				login();
-			}
-		}
+//		// 如果以前登录过，尝试自动登录
+//		if (mHelper.isExistAccount() && mHelper.isExistPassword()) {
+//			mUserName = mHelper.getAccount();
+//			mPassword = mHelper.getPassword();
+//
+//			if (mUserName != null && mPassword != null && !mUserName.isEmpty()
+//					&& !mPassword.isEmpty()) {
+//				mUserNameEditText.setText(mUserName);
+//				mPasswordEditText.setText(mPassword);
+//				progressGenerator.start(mLoginButton);
+//				login();
+//			}
+//		}
 
 		mLoginButton.setOnClickListener(new OnClickListener() {
 

@@ -1,16 +1,16 @@
 package com.puji.guidelicense.view;
 
-import com.puji.guidelicense.R;
-import com.puji.guidelicense.R.styleable;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.puji.guidelicense.R;
 
 public class FoolView extends View {
 
@@ -22,6 +22,9 @@ public class FoolView extends View {
 
 	private int mFloorLetterColor = Color.WHITE;
 	private int mFloorNumberColor = Color.WHITE;
+
+	private Typeface mFloorLetterTypeFace;
+	private Typeface mFloorNumberTypeFace;
 
 	Paint mTextPaint = new Paint();
 
@@ -66,6 +69,24 @@ public class FoolView extends View {
 
 	public void setFloorNumberColor(int mFloorNumberColor) {
 		this.mFloorNumberColor = mFloorNumberColor;
+		invalidate();
+	}
+
+	public Typeface getFloorLetterTypeFace() {
+		return mFloorLetterTypeFace;
+	}
+
+	public void setFloorLetterTypeFace(Typeface mFloorLetterTypeFace) {
+		this.mFloorLetterTypeFace = mFloorLetterTypeFace;
+		invalidate();
+	}
+
+	public Typeface getFloorNumberTypeFace() {
+		return mFloorNumberTypeFace;
+	}
+
+	public void setFloorNumberTypeFace(Typeface mFloorNumberTypeFace) {
+		this.mFloorNumberTypeFace = mFloorNumberTypeFace;
 		invalidate();
 	}
 
@@ -116,7 +137,7 @@ public class FoolView extends View {
 		int h = getFontHeight(mFloorLetterSize, mFloorLetterText)
 				+ getFontHeight(mFloorNumberSize, mFloorNumberText);
 		int w = getFontWidth(mFloorLetterSize, mFloorLetterText)
-				+ getFontWidth(mFloorNumberSize, mFloorNumberText);
+				+ getFontWidth(mFloorNumberSize, mFloorNumberText) + 2;
 		setMeasuredDimension(w, h);
 	}
 
@@ -125,6 +146,9 @@ public class FoolView extends View {
 		super.onDraw(canvas);
 		mTextPaint.setTextSize(mFloorLetterSize);
 		mTextPaint.setColor(mFloorLetterColor);
+		if (mFloorLetterTypeFace != null) {
+			mTextPaint.setTypeface(mFloorLetterTypeFace);
+		}
 		canvas.drawText(mFloorLetterText, 0,
 				getFontHeight(mFloorLetterSize, mFloorLetterText)
 						+ getFontHeight(mFloorNumberSize, mFloorNumberText),
@@ -132,6 +156,10 @@ public class FoolView extends View {
 
 		mTextPaint.setTextSize(mFloorNumberSize);
 		mTextPaint.setColor(mFloorNumberColor);
+		if (mFloorNumberTypeFace != null) {
+			mTextPaint.setTypeface(mFloorNumberTypeFace);
+		}
+
 		canvas.drawText(mFloorNumberText,
 				getFontWidth(mFloorLetterSize, mFloorLetterText),
 				getFontHeight(mFloorNumberSize, mFloorNumberText), mTextPaint);

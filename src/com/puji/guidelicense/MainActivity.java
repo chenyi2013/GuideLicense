@@ -2,6 +2,8 @@ package com.puji.guidelicense;
 
 import java.util.ArrayList;
 
+import com.android.volley.RequestQueue;
+import com.puji.guidelicense.application.GuideLicenseApplication;
 import com.puji.guidelicense.bean.FloorData;
 import com.puji.guidelicense.bean.FloorInfo;
 import com.puji.guidelicense.util.SharePreferenceHelper;
@@ -13,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,17 +44,20 @@ public class MainActivity extends Activity {
 	private int itemLayout;
 	private int headerLayout;
 
-	private final int maxFontSize = 26;
-	private final int minFontSize = 12;
+	private final int maxFontSize = 16;
+	private final int minFontSize = 10;
 	private String currentFoolor;
 
 	private SharePreferenceHelper mHelper;
+	private Typeface mTypeface;
 
 	private float tagSize = 12;
 	private float shopsSize = 12;
 	private float letterSize = 12;
 	private float numberSize = 12;
 	private float textFactor = 1;
+
+	private int padding = 60;
 
 	private int currentFloorColor = Color.parseColor("#fe9200");
 	private int otherFloorColor = Color.WHITE;
@@ -73,6 +79,14 @@ public class MainActivity extends Activity {
 				if (tagSize > minFontSize) {
 					tagSize = tagSize - 1;
 					shopsSize = shopsSize - 1;
+					// if (tagSize <= 12) {
+					// int p = (int) ((14 - tagSize) * 35);
+					// mListView.setPadding(p, 0, p, 0);
+					// }
+					if (tagSize <= 14) {
+						padding = padding + 20;
+						mListView.setPadding(padding, 0, padding, 0);
+					}
 					mListView.setAdapter(mAdapter);
 					mHandler.sendEmptyMessage(1);
 				} else {
@@ -120,7 +134,12 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		GuideLicenseApplication application = (GuideLicenseApplication) getApplication();
+		application.getRequestQueue();
+
 		mHelper = new SharePreferenceHelper(this);
+		mTypeface = Typeface.createFromAsset(getAssets(),
+				"fonts/lucida_sans_regular.ttf");
 
 		itemLayout = R.layout.item_f4;
 		headerLayout = R.layout.header_f4;
@@ -134,7 +153,7 @@ public class MainActivity extends Activity {
 
 		mListView = (ListView) findViewById(R.id.list_view);
 		mListView.setDivider(null);
-		mListView.setPadding(60, 0, 60, 0);
+		mListView.setPadding(padding, 0, padding, 0);
 
 		View header = LayoutInflater.from(this).inflate(headerLayout,
 				mListView, false);
@@ -215,9 +234,13 @@ public class MainActivity extends Activity {
 				viewHolder = new ViewHolder();
 				viewHolder.mFloorName = (FoolView) convertView
 						.findViewById(R.id.floor_name);
+				viewHolder.mFloorName.setFloorLetterTypeFace(mTypeface);
+				viewHolder.mFloorName.setFloorNumberTypeFace(mTypeface);
 				viewHolder.mShops = (TextView) convertView
 						.findViewById(R.id.shops);
+				viewHolder.mShops.setTypeface(mTypeface);
 				viewHolder.mTag = (TextView) convertView.findViewById(R.id.tag);
+				viewHolder.mTag.setTypeface(mTypeface);
 
 				convertView.setTag(viewHolder);
 
@@ -230,23 +253,25 @@ public class MainActivity extends Activity {
 					.setFloorLetterSize(convertSpToPx((int) letterSize));
 			viewHolder.mFloorName
 					.setFloorNumberSize(convertSpToPx((int) (numberSize)));
-			viewHolder.mShops.setText(Html.fromHtml(floor.getInfo(),
+			viewHolder.mShops.setText(Html.fromHtml(floor.getInfo().trim(),
 					new Html.ImageGetter() {
 
 						@Override
 						public Drawable getDrawable(String string) {
 
+							System.out.println("HH:" + string);
 							int height = getFontHeight(
 									convertSpToPx(shopsSize), "测试");
 							Drawable drawable = getResources().getDrawable(
-									R.drawable.ic_launcher);
+									R.drawable.train);
 							drawable.setBounds(0, 0, height, height);
 							return drawable;
 						}
 					}, null));
 
 			viewHolder.mShops.setTextSize(convertSpToPx(shopsSize));
-			viewHolder.mShops.setLineSpacing(1, textFactor);
+			viewHolder.mShops.setLineSpacing(0, textFactor);
+			System.out.println("shopSize:" + shopsSize);
 
 			if (floor.getTag() == null || floor.getTag().isEmpty()) {
 
